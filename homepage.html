@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WallHub - Premium HD Wallpapers</title>
+    <link rel="icon" type="image/png" href="websiteicon/rounded-shark.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="homepage.html" style="text-decoration: none; color: inherit;">
+                <div class="logo">
+                    <h1>WallHub</h1>
+                    <span class="tagline">Premium Wallpapers</span>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="homepage.html" class="nav-link active">Home</a>
+                <a href="categories.html" class="nav-link">Browse Categories</a>
+                <button id="infiniteScrollToggle" title="Toggle Infinite Scroll" style="background: rgba(255,255,255,0.1); border: none; padding: 0.4rem 0.6rem; cursor: pointer; display: flex; align-items: center; transition: all 0.3s; border-radius: 6px;">
+                    <img id="scrollModeIcon" src="websiteicon/infinite.jpg" alt="Toggle" style="width: 18px; height: 18px; object-fit: contain; opacity: 0.7;">
+                </button>
+            </div>
+            <div class="nav-stats">
+                <span id="totalImages">1151</span> <small>Wallpapers</small>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Auto-Rotating Background -->
+    <section class="hero" id="hero">
+        <div class="hero-background" id="heroBackground"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Discover Stunning Wallpapers</h1>
+            <p class="hero-subtitle">Browse thousands of high-quality wallpapers curated for your desktop and mobile</p>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search for wallpapers...">
+                <button class="search-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wallpapers Grid Section -->
+    <section class="wallpapers-section">
+        <div class="container">
+            <div id="wallpapersGrid" class="wallpapers-grid"></div>
+
+            <!-- Pagination Controls -->
+            <div id="paginationControls" class="pagination-controls" style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 3rem; flex-wrap: wrap;">
+                <button id="prevPage" class="page-btn" style="padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    ← Previous
+                </button>
+                <div id="pageNumbers" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+                <button id="nextPage" class="page-btn" style="padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    Next →
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Modal -->
+    <div id="galleryModal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modalTitle"></h2>
+                    <p class="modal-subtitle"><span id="imageCount">0</span> wallpapers</p>
+                </div>
+                <button class="close-btn">&times;</button>
+            </div>
+
+            <div class="resolution-selector">
+                <button class="res-tab active" data-res="1920x1080">
+                    <span class="res-label">Full HD</span>
+                    <span class="res-value">1920x1080</span>
+                </button>
+                <button class="res-tab" data-res="1280x720">
+                    <span class="res-label">HD</span>
+                    <span class="res-value">1280x720</span>
+                </button>
+                <button class="res-tab" data-res="800x600">
+                    <span class="res-label">Standard</span>
+                    <span class="res-value">800x600</span>
+                </button>
+            </div>
+
+            <div id="galleryGrid" class="gallery-grid"></div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imageModal" class="image-modal">
+        <div class="image-modal-overlay"></div>
+        <div class="image-modal-content">
+            <button class="image-close-btn">&times;</button>
+            <img id="previewImage" src="" alt="">
+            <div class="image-info">
+                <h3 id="imageName"></h3>
+                <div class="image-actions">
+                    <button id="downloadBtn" class="action-btn primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="wallpapers-data.js"></script>
+    <script src="script.js"></script>
+    <script src="homepage-rotation.js"></script>
+</body>
+</html>

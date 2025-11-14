@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WallHub - Premium HD Wallpapers</title>
+    <link rel="icon" type="image/png" href="websiteicon/rounded-shark.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="homepage.html" style="text-decoration: none; color: inherit;">
+                <div class="logo">
+                    <h1>WallHub</h1>
+                    <span class="tagline">Premium Wallpapers</span>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="homepage.html" class="nav-link">Home</a>
+                <a href="categories.html" class="nav-link active">Browse Categories</a>
+            </div>
+            <div class="nav-stats">
+                <span id="totalImages">1151</span> <small>Wallpapers</small>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-background" id="heroBackground"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Discover Stunning Wallpapers</h1>
+            <p class="hero-subtitle">Browse thousands of high-quality wallpapers curated for your desktop and mobile</p>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search for categories...">
+                <button class="search-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Browse Categories</h2>
+            </div>
+
+            <div id="categoriesGrid" class="categories-grid"></div>
+        </div>
+    </section>
+
+    <!-- Gallery Modal -->
+    <div id="galleryModal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modalTitle"></h2>
+                    <p class="modal-subtitle"><span id="imageCount">0</span> wallpapers</p>
+                </div>
+                <button class="close-btn">&times;</button>
+            </div>
+
+            <div id="galleryGrid" class="gallery-grid"></div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imageModal" class="image-modal">
+        <div class="image-modal-overlay"></div>
+        <div class="image-modal-content">
+            <button class="image-close-btn">&times;</button>
+            <img id="previewImage" src="" alt="">
+            <div class="image-info">
+                <h3 id="imageName"></h3>
+                <div class="image-actions">
+                    <button id="downloadBtn" class="action-btn primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="wallpapers-data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
