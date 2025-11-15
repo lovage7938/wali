@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Loading Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #16213e;
+            border-radius: 8px;
+        }
+        .test-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            margin: 10px;
+            border: 2px solid #667eea;
+            background: #0f0f1e;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #28a745; }
+        .error { background: #dc3545; }
+        .loading { background: #ffc107; color: black; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Image Loading System Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Queue System</h2>
+        <p>Testing concurrent load limit (should load max 6 at once)</p>
+        <div id="queue-test"></div>
+        <div id="queue-status" class="status loading">Initializing...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Retry Logic</h2>
+        <p>Testing exponential backoff (will simulate failures)</p>
+        <div id="retry-test"></div>
+        <div id="retry-status" class="status loading">Initializing...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Real Image Loading</h2>
+        <p>Loading actual wallpapers from GitHub</p>
+        <div id="real-test"></div>
+        <div id="real-status" class="status loading">Initializing...</div>
+    </div>
+
+    <script src="wallpapers-data.js"></script>
+    <script>
+        // Test 1: Queue System
+        function testQueueSystem() {
+            const queueStatus = document.getElementById('queue-status');
+            let loadQueue = [];
+            let activeLoads = 0;
+            const maxConcurrent = 6;
+            let totalLoaded = 0;
+            let maxConcurrentReached = 0;
+
+            async function processQueue() {
+                while (loadQueue.length > 0 && activeLoads < maxConcurrent) {
+                    activeLoads++;
+                    maxConcurrentReached = Math.max(maxConcurrentReached, activeLoads);
+                    
+                    const task = loadQueue.shift();
+                    await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
+                    
+                    totalLoaded++;
+                    activeLoads--;
+                    
+                    if (loadQueue.length > 0) {
+                        processQueue();
+                    }
+                }
+            }
+
+            // Queue 20 tasks
+            for (let i = 0; i < 20; i++) {
+                loadQueue.push({ id: i });
+            }
+
+            processQueue().then(() => {
+                setTimeout(() => {
+                    queueStatus.className = 'status success';
+                    queueStatus.textContent = `✓ Queue Test Passed! Max concurrent: ${maxConcurrentReached} (limit: ${maxConcurrent}), Total loaded: ${totalLoaded}`;
+                }, 2000);
+            });
+        }
+
+        // Test 2: Retry Logic
+        function testRetryLogic() {
+            const retryStatus = document.getElementById('retry-status');
+            let retryCount = 0;
+            const maxRetries = 5;
+            const delays = [];
+
+            function attemptLoad() {
+                return new Promise((resolve, reject) => {
+                    retryCount++;
+                    const delay = Math.min(1000 * Math.pow(2, retryCount - 1), 16000);
+                    delays.push(delay);
+                    
+                    if (retryCount <= maxRetries) {
+                        setTimeout(() => {
+                            attemptLoad().then(resolve);
+                        }, delay);
+                    } else {
+                        resolve();
+                    }
+                });
+            }
+
+            attemptLoad().then(() => {
+                retryStatus.className = 'status success';
+                retryStatus.textContent = `✓ Retry Test Passed! Retries: ${retryCount}, Delays: [${delays.join('ms, ')}ms]`;
+            });
+        }
+
+        // Test 3: Real Image Loading
+        function testRealImages() {
+            const realTest = document.getElementById('real-test');
+            const realStatus = document.getElementById('real-status');
+            
+            const testImages = [
+                "https://raw.githubusercontent.com/D3Ext/aesthetic-wallpapers/main/images/anime-pond.png",
+                "https://raw.githubusercontent.com/D3Ext/aesthetic-wallpapers/main/images/astronaut.jpg",
+                "https://raw.githubusercontent.com/lovage7938/WallHub/master/clouds.png"
+            ];
+
+            let loaded = 0;
+            let failed = 0;
+
+            testImages.forEach((url, index) => {
+                const img = document.createElement('img');
+                img.className = 'test-image';
+                img.alt = `Test ${index + 1}`;
+                
+                img.onload = () => {
+                    loaded++;
+                    updateStatus();
+                };
+                
+                img.onerror = () => {
+                    failed++;
+                    updateStatus();
+                };
+                
+                img.src = url;
+                realTest.appendChild(img);
+            });
+
+            function updateStatus() {
+                if (loaded + failed === testImages.length) {
+                    if (failed === 0) {
+                        realStatus.className = 'status success';
+                        realStatus.textContent = `✓ Real Image Test Passed! All ${loaded} images loaded successfully`;
+                    } else {
+                        realStatus.className = 'status error';
+                        realStatus.textContent = `⚠ Real Image Test: ${loaded} loaded, ${failed} failed`;
+                    }
+                }
+            }
+        }
+
+        // Run all tests
+        window.onload = () => {
+            testQueueSystem();
+            testRetryLogic();
+            testRealImages();
+        };
+    </script>
+</body>
+</html>

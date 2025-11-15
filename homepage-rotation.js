@@ -91,10 +91,78 @@
         }, 5000);
     }
 
+    // Image loading queue to prevent overwhelming the server
+    let imageLoadQueue = [];
+    let activeLoads = 0;
+    const maxConcurrentLoads = 6; // Limit concurrent image loads
+
+    function loadImageWithRetry(img, url, maxRetries = 5) {
+        return new Promise((resolve, reject) => {
+            let retryCount = 0;
+            
+            const attemptLoad = () => {
+                img.onload = () => {
+                    img.classList.add('loaded');
+                    resolve();
+                };
+                
+                img.onerror = () => {
+                    retryCount++;
+                    if (retryCount <= maxRetries) {
+                        // Exponential backoff: 1s, 2s, 4s, 8s, 16s
+                        const delay = Math.min(1000 * Math.pow(2, retryCount - 1), 16000);
+                        console.log(`Retry ${retryCount}/${maxRetries} for image after ${delay}ms`);
+                        setTimeout(() => {
+                            // Add cache buster to force reload
+                            img.src = url + (url.includes('?') ? '&' : '?') + `retry=${retryCount}&t=${Date.now()}`;
+                        }, delay);
+                    } else {
+                        console.error('Failed to load image after retries:', url);
+                        // Show placeholder or error state
+                        img.classList.add('load-error');
+                        resolve(); // Resolve anyway to continue queue
+                    }
+                };
+                
+                img.src = url;
+            };
+            
+            attemptLoad();
+        });
+    }
+
+    async function processImageQueue() {
+        while (imageLoadQueue.length > 0 && activeLoads < maxConcurrentLoads) {
+            const { img, url } = imageLoadQueue.shift();
+            activeLoads++;
+            
+            try {
+                await loadImageWithRetry(img, url);
+            } catch (error) {
+                console.error('Image load error:', error);
+            } finally {
+                activeLoads--;
+                // Process next item
+                if (imageLoadQueue.length > 0) {
+                    processImageQueue();
+                }
+            }
+        }
+    }
+
+    function queueImageLoad(img, url) {
+        imageLoadQueue.push({ img, url });
+        processImageQueue();
+    }
+
     // Display wallpapers grid with pagination
     function displayWallpapers(wallpapers) {
         const grid = document.getElementById('wallpapersGrid');
         grid.innerHTML = '';
+        
+        // Clear queue for new page
+        imageLoadQueue = [];
+        activeLoads = 0;
 
         // Calculate pagination
         const totalPages = Math.ceil(wallpapers.length / itemsPerPage);
@@ -108,21 +176,27 @@
 
             const img = document.createElement('img');
             const directUrl = getDirectImageUrlSync(wallpaper.url);
-            img.src = directUrl;
             img.alt = `${wallpaper.caption}`;
-            img.className = 'wallpaper-img';
+            img.className = 'wallpaper-img loading';
             img.loading = 'lazy';
+            
+            // Add loading placeholder
+            img.style.backgroundColor = '#1a1a2e';
+            img.style.minHeight = '200px';
 
-            // Retry on error
-            img.onerror = function() {
-                const retry = parseInt(this.dataset.retry || '0');
-                if (retry < 2) {
-                    setTimeout(() => {
-                        this.dataset.retry = (retry + 1).toString();
-                        this.src = directUrl + '?retry=' + retry;
-                    }, 1000 * (retry + 1));
-                }
-            };
+            // Use IntersectionObserver for better lazy loading
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        queueImageLoad(img, directUrl);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                rootMargin: '50px' // Start loading 50px before entering viewport
+            });
+            
+            observer.observe(img);
 
             const info = document.createElement('div');
             info.className = 'wallpaper-item-info';

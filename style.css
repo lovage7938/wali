@@ -286,14 +286,26 @@ body {
     border-color: var(--primary);
 }
 
-.category-card img {
+.category-card img,
+.category-card-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.5s ease, opacity 0.3s;
+    background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
 }
 
-.category-card:hover img {
+.category-card-img.loaded {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.category-card-img.load-error {
+    background: linear-gradient(135deg, #2a0a0a 0%, #1a0505 100%);
+    opacity: 0.5;
+}
+
+.category-card:hover img,
+.category-card:hover .category-card-img {
     transform: scale(1.1);
 }
 
@@ -485,14 +497,26 @@ body {
     border-color: var(--primary);
 }
 
-.gallery-item img {
+.gallery-item img,
+.gallery-item-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s;
+    transition: transform 0.5s, opacity 0.3s;
+    background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
 }
 
-.gallery-item:hover img {
+.gallery-item-img.loaded {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.gallery-item-img.load-error {
+    background: linear-gradient(135deg, #2a0a0a 0%, #1a0505 100%);
+    opacity: 0.5;
+}
+
+.gallery-item:hover img,
+.gallery-item:hover .gallery-item-img {
     transform: scale(1.05);
 }
 
@@ -716,7 +740,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s;
+    transition: transform 0.4s, opacity 0.3s;
 }
 
 .wallpaper-img.lazy {
@@ -724,16 +748,65 @@ body {
     min-height: 200px;
 }
 
+.wallpaper-img.loading {
+    background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+    min-height: 200px;
+    position: relative;
+    opacity: 0.7;
+}
+
+.wallpaper-img.loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
 .wallpaper-img.loaded {
-    animation: fadeIn 0.3s ease-in;
+    animation: fadeIn 0.5s ease-in;
+    opacity: 1;
+}
+
+.wallpaper-img.load-error {
+    background: linear-gradient(135deg, #2a0a0a 0%, #1a0505 100%);
+    position: relative;
+    opacity: 0.5;
+}
+
+.wallpaper-img.load-error::after {
+    content: 'âš ï¸ Load Failed';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
+        transform: scale(0.95);
     }
     to {
         opacity: 1;
+        transform: scale(1);
     }
 }
 

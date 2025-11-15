@@ -108,15 +108,52 @@ function createCategoryCard(category) {
     card.onclick = () => openGallery(category);
 
     const directUrl = getDirectImageUrlSync(previewUrl);
+    
+    const img = document.createElement('img');
+    img.alt = category;
+    img.loading = 'lazy';
+    img.className = 'category-card-img';
+    
+    // Enhanced retry logic for category cards
+    let retryCount = 0;
+    const maxRetries = 5;
+    
+    const loadImage = () => {
+        img.onload = () => {
+            img.classList.add('loaded');
+        };
+        
+        img.onerror = () => {
+            retryCount++;
+            if (retryCount <= maxRetries) {
+                const delay = Math.min(1000 * Math.pow(2, retryCount - 1), 16000);
+                setTimeout(() => {
+                    img.src = directUrl + (directUrl.includes('?') ? '&' : '?') + `retry=${retryCount}&t=${Date.now()}`;
+                }, delay);
+            } else {
+                img.classList.add('load-error');
+            }
+        };
+        
+        img.src = directUrl;
+    };
+    
+    loadImage();
 
-    card.innerHTML = `
-        <img src="${directUrl}" alt="${category}" loading="lazy">
-        <div class="category-badge">${count}</div>
-        <div class="category-info">
-            <h3>${category}</h3>
-            <p>${count} wallpapers available</p>
-        </div>
+    const badge = document.createElement('div');
+    badge.className = 'category-badge';
+    badge.textContent = count;
+    
+    const info = document.createElement('div');
+    info.className = 'category-info';
+    info.innerHTML = `
+        <h3>${category}</h3>
+        <p>${count} wallpapers available</p>
     `;
+    
+    card.appendChild(img);
+    card.appendChild(badge);
+    card.appendChild(info);
 
     return card;
 }
@@ -156,15 +193,46 @@ function createGalleryItem(url, category, number, resolution) {
     item.className = 'gallery-item';
 
     const directUrl = getDirectImageUrlSync(url);
+    
+    const img = document.createElement('img');
+    img.alt = `${category} ${number}`;
+    img.loading = 'lazy';
+    img.className = 'gallery-item-img';
+    
+    // Enhanced retry logic for gallery items
+    let retryCount = 0;
+    const maxRetries = 5;
+    
+    const loadImage = () => {
+        img.onload = () => {
+            img.classList.add('loaded');
+        };
+        
+        img.onerror = () => {
+            retryCount++;
+            if (retryCount <= maxRetries) {
+                const delay = Math.min(1000 * Math.pow(2, retryCount - 1), 16000);
+                setTimeout(() => {
+                    img.src = directUrl + (directUrl.includes('?') ? '&' : '?') + `retry=${retryCount}&t=${Date.now()}`;
+                }, delay);
+            } else {
+                img.classList.add('load-error');
+            }
+        };
+        
+        img.src = directUrl;
+    };
+    
+    loadImage();
 
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    overlay.innerHTML = `<p><strong>${category}</strong> #${number}</p>`;
+    
+    item.appendChild(img);
+    item.appendChild(overlay);
+    
     item.onclick = () => openImagePreview(directUrl, category, number, resolution);
-
-    item.innerHTML = `
-        <img src="${directUrl}" alt="${category} ${number}" loading="lazy">
-        <div class="overlay">
-            <p><strong>${category}</strong> #${number}</p>
-        </div>
-    `;
 
     return item;
 }
